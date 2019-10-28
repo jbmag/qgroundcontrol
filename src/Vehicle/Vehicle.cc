@@ -799,6 +799,12 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         _handlePing(link, message);
         break;
 
+    //TOPO: start MOD
+    case MAVLINK_MSG_ID_DEBUG:
+        _handleDebug(message);
+        break;
+   //TOPO: end MOD
+
     case MAVLINK_MSG_ID_SERIAL_CONTROL:
     {
         mavlink_serial_control_t ser;
@@ -1666,6 +1672,25 @@ void Vehicle::_handlePing(LinkInterface* link, mavlink_message_t& message)
                                message.compid);
     sendMessageOnLink(link, msg);
 }
+
+//TOPO: start MOD
+void Vehicle::_handleDebug(mavlink_message_t& message)
+{
+    _timestampRcvDebug = mavlink_msg_debug_get_time_boot_ms(&message);
+    uint8_t msgInd = 0;
+    msgInd = mavlink_msg_debug_get_ind(&message);
+    switch(msgInd){
+        case 1: //giinav status
+            _messageValueDebug = static_cast<uint16_t>(mavlink_msg_debug_get_value(&message));
+            if(_messageValueDebug < _differentStatusNb)
+            {
+                _currGiinavStatus = _giinavStatus[_messageValueDebug];
+                emit giinavStatusChanged();
+            }
+    }
+
+}
+//TOPO: end MOD
 
 void Vehicle::_handleHeartbeat(mavlink_message_t& message)
 {
@@ -3279,6 +3304,19 @@ void Vehicle::_sendMavCommandAgain(void)
     sendMessageOnLink(priorityLink(), msg);
 }
 
+void Vehicle::sendMessageDebug(uint8_t timestamp, uint8_t index, float value)
+{
+    mavlink_message_t msg;
+    mavlink_msg_debug_pack_chan(_mavlink->getSystemId(),
+                                         _mavlink->getComponentId(),
+                                         priorityLink()->mavlinkChannel(),
+                                         &msg,
+                                         timestamp,
+                                         index,
+                                         value);
+    sendMessageOnLink(priorityLink(), msg);
+}
+
 void Vehicle::_sendNextQueuedMavCommand(void)
 {
     if (_mavCommandQueue.count()) {
@@ -3846,6 +3884,14 @@ int  Vehicle::versionCompare(int major, int minor, int patch)
 {
     return _firmwarePlugin->versionCompare(this, major, minor, patch);
 }
+
+//TOPO mod start
+// get current giinav status
+QString Vehicle::_getCurrGiinavStatus(void)
+{
+    return _currGiinavStatus;
+}
+//TOPO mod end
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

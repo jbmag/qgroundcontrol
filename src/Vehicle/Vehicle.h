@@ -483,6 +483,10 @@ private:
 #endif
 };
 
+//TOPO mod: static array for status giinav message
+static const char* _giinavStatus[] {"first status","second status","third status"};
+static const int _differentStatusNb = 3;
+//TOPO mod end
 
 class Vehicle : public FactGroup
 {
@@ -688,6 +692,10 @@ public:
     Q_PROPERTY(quint64  vehicleUID                  READ vehicleUID                 NOTIFY vehicleUIDChanged)
     Q_PROPERTY(QString  vehicleUIDStr               READ vehicleUIDStr              NOTIFY vehicleUIDChanged)
 
+    //TOPO mod start
+    // property text of giinav status
+    Q_PROPERTY(QString giinavStatus MEMBER _currGiinavStatus NOTIFY giinavStatusChanged)
+
     /// Resets link status counters
     Q_INVOKABLE void resetCounters  ();
 
@@ -806,6 +814,10 @@ public:
     /// guarantee that it makes it to the vehicle.
     void sendMessageMultiple(mavlink_message_t message);
 
+    ///MOD for TOPO: sends a debug Message
+    void sendMessageDebug(uint8_t timestamp, uint8_t index, float value);
+
+
     /// Provides access to uas from vehicle. Temporary workaround until UAS is fully phased out.
     UAS* uas(void) { return _uas; }
 
@@ -863,6 +875,9 @@ public:
     //-- Mavlink Logging
     void startMavlinkLog();
     void stopMavlinkLog();
+
+    //TOPO mod: get current giinav status
+    QString _getCurrGiinavStatus(void);
 
     /// Requests the specified data stream from the vehicle
     ///     @param stream Stream which is being requested
@@ -1181,6 +1196,9 @@ signals:
     void requestProtocolVersion(unsigned version);
     void mavlinkStatusChanged();
 
+    //TOPO mod start: signal emitted when giinav status changed
+    void giinavStatusChanged();
+
 private slots:
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
     void _linkInactiveOrDeleted(LinkInterface* link);
@@ -1283,6 +1301,9 @@ private:
     void _setCapabilities(uint64_t capabilityBits);
     void _updateArmed(bool armed);
     bool _apmArmingNotRequired(void);
+
+    //TOPO mod start: declare handle for debug mavlink message
+    void _handleDebug(mavlink_message_t& message);
 
     int     _id;                    ///< Mavlink system id
     int     _defaultComponentId;
@@ -1464,6 +1485,13 @@ private:
     QGCMapCircle    _orbitMapCircle;
     QTimer          _orbitTelemetryTimer;
     static const int _orbitTelemetryTimeoutMsecs = 3000; // No telemetry for this amount and orbit will go inactive
+
+    //TOPO: mod START
+    //variables to handle incoming status as debug named value float mavlink messages
+    uint32_t _timestampRcvDebug;
+    uint16_t _messageValueDebug;
+    QString _currGiinavStatus;
+    //TOPO: mod END
 
     // FactGroup facts
 
