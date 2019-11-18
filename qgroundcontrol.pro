@@ -401,6 +401,7 @@ FORMS += \
 #
 
 HEADERS += \
+    src/ViewWidgets/CustomSuppTrackManager.h \
     src/api/QGCCorePlugin.h \
     src/api/QGCOptions.h \
     src/api/QGCSettings.h \
@@ -409,6 +410,7 @@ HEADERS += \
     src/GPS/Drivers/src/base_station.h
 
 SOURCES += \
+    src/ViewWidgets/CustomSuppTrackManager.cc \
     src/api/QGCCorePlugin.cc \
     src/api/QGCOptions.cc \
     src/api/QGCSettings.cc \

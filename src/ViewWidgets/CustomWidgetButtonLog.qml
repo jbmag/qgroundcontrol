@@ -1,4 +1,6 @@
 import QtQuick 2.2
+import QtQuick.Extras 1.4
+import QtQuick.Controls 1.2
 
 
 import QGroundControl.Controls      1.0
@@ -20,6 +22,7 @@ Rectangle {
             mtext.append(controller.getCurrentGiinavStatus()+"\n")
             mflick.flick(0,-1000)
         }
+        onGiinavStart: switchGiinav.enabled= true
 
     }
 
@@ -30,14 +33,24 @@ Rectangle {
         spacing: ScreenTools.defaultFontPixelHeight
 
         QGCButton {
-            text: "Send debug message"
-            // Arguments to CustomCommandWidgetController::sendCommand (MAVLink COMMAND_LONG)
-            //   command id
-            //   component id
-            //   confirmation
-            //   param 1-7
+            text: "Disable GNSS"
             onClicked:  controller.sendDebugMsg(253, 1, 1)
-
+        }
+        Row{
+            spacing: 5
+            QGCSwitch{
+                id: switchGiinav
+                enabled: false
+                onCheckedChanged: controller.toggleGiinav()
+            }
+            Text {           
+                text: "Display Giinav Solution on Map"
+                color: "white"
+            }
+        }
+        Text {
+            text: " \nOnboard Computer Status: "
+            color: "white"
         }
         Flickable{
             id: mflick

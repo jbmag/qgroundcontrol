@@ -483,10 +483,7 @@ private:
 #endif
 };
 
-//TOPO mod: static array for status giinav message
-static const char* _giinavStatus[] {"first status","second status","third status"};
-static const int _differentStatusNb = 3;
-//TOPO mod end
+
 
 class Vehicle : public FactGroup
 {
@@ -695,6 +692,8 @@ public:
     //TOPO mod start
     // property text of giinav status
     Q_PROPERTY(QString giinavStatus MEMBER _currGiinavStatus NOTIFY giinavStatusChanged)
+    // property for giinav_coordinate 
+    Q_PROPERTY(QGeoCoordinate giinavCoordinate MEMBER _giinavCoordinate NOTIFY giinavCoordinateChanged)
 
     /// Resets link status counters
     Q_INVOKABLE void resetCounters  ();
@@ -878,6 +877,7 @@ public:
 
     //TOPO mod: get current giinav status
     QString _getCurrGiinavStatus(void);
+    QGeoCoordinate _getGiinavCoordinates(void);
 
     /// Requests the specified data stream from the vehicle
     ///     @param stream Stream which is being requested
@@ -1089,6 +1089,10 @@ public:
     quint64     mavlinkLossCount        () { return _mavlinkLossCount; }        /// Total number of lost messages
     float       mavlinkLossPercent      () { return _mavlinkLossPercent; }      /// Running loss rate
 
+    //TOPO mod
+    //toggle boolean that determine if Giinav coordinates are displayed on Map
+    void _toggleDisplayGiinav(void);
+
 signals:
     void allLinksInactive(Vehicle* vehicle);
     void coordinateChanged(QGeoCoordinate coordinate);
@@ -1198,6 +1202,12 @@ signals:
 
     //TOPO mod start: signal emitted when giinav status changed
     void giinavStatusChanged();
+    // signal emitted when new giinav coordinate
+    void giinavCoordinateChanged();
+    // signal emitted when giinav coordinates are received for the first time
+    void giinavStartable();
+    // signal emitted when switch button is toggled in qml widget
+    void toggleGiinavOnMap();
 
 private slots:
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
@@ -1304,6 +1314,7 @@ private:
 
     //TOPO mod start: declare handle for debug mavlink message
     void _handleDebug(mavlink_message_t& message);
+    void _handleDebugVect(mavlink_message_t& message);
 
     int     _id;                    ///< Mavlink system id
     int     _defaultComponentId;
@@ -1488,9 +1499,17 @@ private:
 
     //TOPO: mod START
     //variables to handle incoming status as debug named value float mavlink messages
+    //static array for status giinav message
+    static const char* const  _giinavStatus [];
+    static const int _differentStatusNb;
     uint32_t _timestampRcvDebug;
     uint16_t _messageValueDebug;
     QString _currGiinavStatus;
+    uint64_t _timestampRcvDebugVect;
+    static const std::string _msgNameDebugVect;
+    //coordinates from Giinav
+    QGeoCoordinate _giinavCoordinate;
+    bool _displayGiinav;
     //TOPO: mod END
 
     // FactGroup facts

@@ -21,6 +21,7 @@ import QGroundControl.ScreenTools           1.0
 import QGroundControl.MultiVehicleManager   1.0
 import QGroundControl.Vehicle               1.0
 import QGroundControl.QGCPositionManager    1.0
+import QGroundControl.Controllers   1.0
 
 Map {
     id: _map
@@ -127,6 +128,36 @@ Map {
         onRawValueChanged:  updateActiveMapType()
     }
 
+    property bool displayGiinav: false
+    CustomSuppTrackManager {
+                   id : suppTrackGiinav
+                   onDisplayGiinavMapItem: {
+                       displayGiinav = !displayGiinav
+                   }
+               }
+
+
+    on_ActiveVehicleChanged: suppTrackGiinav._initialize()
+
+    MapQuickItem {
+        id: giinavMapItem
+        coordinate: suppTrackGiinav.giinavCoordinates
+        sourceItem: Rectangle { width: 25; height: 25; color: "red"; border.width: 2; border.color: "blue"; smooth: true; radius: 15 }
+        opacity:1.0
+        anchorPoint.x:  sourceItem.width / 2
+        anchorPoint.y:  sourceItem.height / 2
+        visible: displayGiinav
+        onCoordinateChanged: lineGiinav.addCoordinate(coordinate)
+    }
+    MapPolyline {
+        id : lineGiinav
+        line.width: 3
+        line.color: "blue"
+        visible: displayGiinav
+        //giinavMapItem.onCoordinateChanged: addCoordinate(giinavMapItem.coordinate)
+
+    }
+
     /// Ground Station location
     MapQuickItem {
         anchorPoint.x:  sourceItem.width / 2
@@ -149,4 +180,5 @@ Map {
             }
         }
     }
+
 } // Map

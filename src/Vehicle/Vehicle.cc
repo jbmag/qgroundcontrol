@@ -86,6 +86,9 @@ const char* Vehicle::_clockFactGroupName =              "clock";
 const char* Vehicle::_distanceSensorFactGroupName =     "distanceSensor";
 const char* Vehicle::_estimatorStatusFactGroupName =    "estimatorStatus";
 
+const char* const Vehicle::_giinavStatus[] =  {"first status","   Giinav Status","third status"};
+const int Vehicle::_differentStatusNb = 3;
+const std::string Vehicle::_msgNameDebugVect = "coord2";
 // Standard connected vehicle
 Vehicle::Vehicle(LinkInterface*             link,
                  int                        vehicleId,
@@ -802,6 +805,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     //TOPO: start MOD
     case MAVLINK_MSG_ID_DEBUG:
         _handleDebug(message);
+        break;
+    case MAVLINK_MSG_ID_DEBUG_VECT:
+        _handleDebugVect(message);
         break;
    //TOPO: end MOD
 
@@ -1689,6 +1695,48 @@ void Vehicle::_handleDebug(mavlink_message_t& message)
             }
     }
 
+}
+
+void Vehicle::_handleDebugVect(mavlink_message_t& message)
+{
+    char nameMsg [10];
+    std::string nameMsgS;
+    mavlink_msg_debug_vect_get_name(&message, nameMsg);
+    nameMsgS = nameMsg;
+
+    if (nameMsgS == _msgNameDebugVect)
+    {
+        _timestampRcvDebugVect = mavlink_msg_debug_vect_get_time_usec(&message);
+        _giinavCoordinate.setLatitude(static_cast<double>(mavlink_msg_debug_vect_get_x(&message)));
+        _giinavCoordinate.setLongitude(static_cast<double>(mavlink_msg_debug_vect_get_y(&message)));
+        _giinavCoordinate.setAltitude(static_cast<double>(mavlink_msg_debug_vect_get_z(&message)));
+
+
+        static bool giinavInitialized = false;
+        if (!giinavInitialized){
+            giinavInitialized = true;
+            _displayGiinav = false; //don't display on map by default
+
+            emit giinavStartable(); //emitted only when first received (PROBLEM?) allow the switch on widget to be clickable
+        }
+        if (_displayGiinav){
+            emit giinavCoordinateChanged();
+        }
+
+    }
+    
+
+}
+
+void Vehicle::_toggleDisplayGiinav(void)
+{
+    _displayGiinav = !_displayGiinav;
+    emit toggleGiinavOnMap();
+}
+
+QGeoCoordinate Vehicle::_getGiinavCoordinates(void)
+{
+    return _giinavCoordinate;
 }
 //TOPO: end MOD
 

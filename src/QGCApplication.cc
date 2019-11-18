@@ -48,6 +48,7 @@
 #include "ViewWidgetController.h"
 #include "ParameterEditorController.h"
 #include "CustomCommandWidgetController.h"
+#include "CustomSuppTrackManager.h"
 #include "ESP8266ComponentController.h"
 #include "ScreenToolsController.h"
 #include "QGCFileDialogController.h"
@@ -454,6 +455,7 @@ void QGCApplication::_initCommon(void)
 #ifndef __mobile__
     qmlRegisterType<ViewWidgetController>           (kQGCControllers,                       1, 0, "ViewWidgetController");
     qmlRegisterType<CustomCommandWidgetController>  (kQGCControllers,                       1, 0, "CustomCommandWidgetController");
+    qmlRegisterType<CustomSuppTrackManager>         (kQGCControllers,                       1, 0, "CustomSuppTrackManager");
 #ifndef NO_SERIAL_LINK
     qmlRegisterType<FirmwareUpgradeController>      (kQGCControllers,                       1, 0, "FirmwareUpgradeController");
 #endif

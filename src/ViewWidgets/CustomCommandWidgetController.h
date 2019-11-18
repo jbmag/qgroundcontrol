@@ -33,12 +33,16 @@ public:
     //End MOD
     Q_INVOKABLE void selectQmlFile  (void);
     Q_INVOKABLE void clearQmlFile   (void);
+    Q_INVOKABLE void toggleGiinav   (void);
     
 signals:
     void customQmlFileChanged   (const QString& customQmlFile);
     void statusChanged (void);
+    void giinavStart(void);
+
 public slots:
     void updateGiinavStatus(void);
+    void giinavReceivedFirstTime(void);
 
 
 

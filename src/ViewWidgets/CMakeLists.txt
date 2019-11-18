@@ -3,6 +3,7 @@ add_library(ViewWidgets
 	CustomCommandWidget.cc
 	CustomCommandWidgetController.cc
 	ViewWidgetController.cc
+        CustomSuppTrackManager.cc
 )
 
 target_link_libraries(ViewWidgets

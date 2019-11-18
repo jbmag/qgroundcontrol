@@ -30,6 +30,7 @@ CustomCommandWidgetController::CustomCommandWidgetController(void) :
     _customQmlFile = settings.value(_settingsKey).toString();
     //TOPO mod
     QObject::connect(_vehicle, &Vehicle::giinavStatusChanged, this, &CustomCommandWidgetController::updateGiinavStatus);
+    QObject::connect(_vehicle, &Vehicle::giinavStartable, this, &CustomCommandWidgetController::giinavReceivedFirstTime);
 }
 
 void CustomCommandWidgetController::sendCommand(int commandId, QVariant componentId, QVariant confirm, QVariant param1, QVariant param2, QVariant param3, QVariant param4, QVariant param5, QVariant param6, QVariant param7)
@@ -57,8 +58,17 @@ void CustomCommandWidgetController::updateGiinavStatus(void){
     emit statusChanged();
 }
 
+void CustomCommandWidgetController::giinavReceivedFirstTime(void){
+    emit giinavStart();
+}
+
+
 QString CustomCommandWidgetController::getCurrentGiinavStatus(void){
     return _currGiinavStatus;
+}
+
+void CustomCommandWidgetController::toggleGiinav(void){
+    _vehicle->_toggleDisplayGiinav();
 }
 
 void CustomCommandWidgetController::selectQmlFile(void)
