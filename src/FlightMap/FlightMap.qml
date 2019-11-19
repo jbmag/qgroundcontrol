@@ -129,16 +129,17 @@ Map {
     }
 
     property bool displayGiinav: false
+    // object to handle giinav coordinates
     CustomSuppTrackManager {
                    id : suppTrackGiinav
                    onDisplayGiinavMapItem: {
                        displayGiinav = !displayGiinav
                    }
                }
-
-
+    // call to set active vehicle in CustomSuppTrackManager
     on_ActiveVehicleChanged: suppTrackGiinav._initialize()
 
+    // item that retpresents giinav coordinates on the map
     MapQuickItem {
         id: giinavMapItem
         coordinate: suppTrackGiinav.giinavCoordinates
@@ -149,6 +150,8 @@ Map {
         visible: displayGiinav
         onCoordinateChanged: lineGiinav.addCoordinate(coordinate)
     }
+
+    // giinav track
     MapPolyline {
         id : lineGiinav
         line.width: 3

@@ -689,7 +689,6 @@ public:
     Q_PROPERTY(quint64  vehicleUID                  READ vehicleUID                 NOTIFY vehicleUIDChanged)
     Q_PROPERTY(QString  vehicleUIDStr               READ vehicleUIDStr              NOTIFY vehicleUIDChanged)
 
-    //TOPO mod start
     // property text of giinav status
     Q_PROPERTY(QString giinavStatus MEMBER _currGiinavStatus NOTIFY giinavStatusChanged)
     // property for giinav_coordinate 
@@ -813,7 +812,7 @@ public:
     /// guarantee that it makes it to the vehicle.
     void sendMessageMultiple(mavlink_message_t message);
 
-    ///MOD for TOPO: sends a debug Message
+    /// Sends a debug Message, MAVLink
     void sendMessageDebug(uint8_t timestamp, uint8_t index, float value);
 
 
