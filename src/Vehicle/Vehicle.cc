@@ -86,9 +86,6 @@ const char* Vehicle::_clockFactGroupName =              "clock";
 const char* Vehicle::_distanceSensorFactGroupName =     "distanceSensor";
 const char* Vehicle::_estimatorStatusFactGroupName =    "estimatorStatus";
 
-const char* const Vehicle::_giinavStatus[] =  {"first status","   Giinav Status","third status"};
-const int Vehicle::_differentStatusNb = 3;
-const std::string Vehicle::_msgNameDebugVect = "coord2";
 // Standard connected vehicle
 Vehicle::Vehicle(LinkInterface*             link,
                  int                        vehicleId,
@@ -802,14 +799,13 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         _handlePing(link, message);
         break;
 
-    //TOPO: start MOD
-    case MAVLINK_MSG_ID_DEBUG:
-        _handleDebug(message);
-        break;
     case MAVLINK_MSG_ID_DEBUG_VECT:
         _handleDebugVect(message);
         break;
-   //TOPO: end MOD
+    case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
+        _handleNamedValueFloat(message);
+        break;
+
 
     case MAVLINK_MSG_ID_SERIAL_CONTROL:
     {
@@ -1679,22 +1675,18 @@ void Vehicle::_handlePing(LinkInterface* link, mavlink_message_t& message)
     sendMessageOnLink(link, msg);
 }
 
-//TOPO: start MOD
-void Vehicle::_handleDebug(mavlink_message_t& message)
-{
-    _timestampRcvDebug = mavlink_msg_debug_get_time_boot_ms(&message);
-    uint8_t msgInd = 0;
-    msgInd = mavlink_msg_debug_get_ind(&message);
-    switch(msgInd){
-        case 1: //giinav status
-            _messageValueDebug = static_cast<uint16_t>(mavlink_msg_debug_get_value(&message));
-            if(_messageValueDebug < _differentStatusNb)
-            {
-                _currGiinavStatus = _giinavStatus[_messageValueDebug];
-                emit giinavStatusChanged();
-            }
-    }
 
+void Vehicle::_handleNamedValueFloat(mavlink_message_t &message)
+{
+    char nameMsg [10];
+    std::string nameMsgS;
+    mavlink_msg_named_value_float_get_name(&message, nameMsg);
+    nameMsgS = nameMsg;
+
+    if(nameMsgS == "Gstatus"){
+        uint16_t value = static_cast<uint16_t>(mavlink_msg_named_value_float_get_value(&message));
+        vehicleExtensionTopo.handleReceivedGiinavStatus(value);
+    }
 }
 
 void Vehicle::_handleDebugVect(mavlink_message_t& message)
@@ -1704,41 +1696,13 @@ void Vehicle::_handleDebugVect(mavlink_message_t& message)
     mavlink_msg_debug_vect_get_name(&message, nameMsg);
     nameMsgS = nameMsg;
 
-    if (nameMsgS == _msgNameDebugVect)
+    if (nameMsgS == "Gcoord")
     {
-        _timestampRcvDebugVect = mavlink_msg_debug_vect_get_time_usec(&message);
-        _giinavCoordinate.setLatitude(static_cast<double>(mavlink_msg_debug_vect_get_x(&message)));
-        _giinavCoordinate.setLongitude(static_cast<double>(mavlink_msg_debug_vect_get_y(&message)));
-        _giinavCoordinate.setAltitude(static_cast<double>(mavlink_msg_debug_vect_get_z(&message)));
-
-
-        static bool giinavInitialized = false;
-        if (!giinavInitialized){
-            giinavInitialized = true;
-            _displayGiinav = false; //don't display on map by default
-
-            emit giinavStartable(); //emitted only when first received (PROBLEM?) allow the switch on widget to be clickable
-        }
-        if (_displayGiinav){
-            emit giinavCoordinateChanged();
-        }
-
+        vehicleExtensionTopo.handleReceivedGiinavCoordinates(mavlink_msg_debug_vect_get_x(&message), mavlink_msg_debug_vect_get_y(&message), mavlink_msg_debug_vect_get_z(&message), mavlink_msg_debug_vect_get_time_usec(&message));
     }
     
-
 }
 
-void Vehicle::_toggleDisplayGiinav(void)
-{
-    _displayGiinav = !_displayGiinav;
-    emit toggleGiinavOnMap();
-}
-
-QGeoCoordinate Vehicle::_getGiinavCoordinates(void)
-{
-    return _giinavCoordinate;
-}
-//TOPO: end MOD
 
 void Vehicle::_handleHeartbeat(mavlink_message_t& message)
 {
@@ -3352,15 +3316,15 @@ void Vehicle::_sendMavCommandAgain(void)
     sendMessageOnLink(priorityLink(), msg);
 }
 
-void Vehicle::sendMessageDebug(uint8_t timestamp, uint8_t index, float value)
+void Vehicle::sendMessageDebug(char name[], float value)
 {
     mavlink_message_t msg;
-    mavlink_msg_debug_pack_chan(_mavlink->getSystemId(),
+    mavlink_msg_named_value_float_pack_chan(_mavlink->getSystemId(),
                                          _mavlink->getComponentId(),
                                          priorityLink()->mavlinkChannel(),
                                          &msg,
-                                         timestamp,
-                                         index,
+                                         0,
+                                         name,
                                          value);
     sendMessageOnLink(priorityLink(), msg);
 }
@@ -3933,13 +3897,6 @@ int  Vehicle::versionCompare(int major, int minor, int patch)
     return _firmwarePlugin->versionCompare(this, major, minor, patch);
 }
 
-//TOPO mod start
-// get current giinav status
-QString Vehicle::_getCurrGiinavStatus(void)
-{
-    return _currGiinavStatus;
-}
-//TOPO mod end
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

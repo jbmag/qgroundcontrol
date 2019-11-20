@@ -34,7 +34,7 @@ Rectangle {
 
         QGCButton {
             text: "Disable GNSS"
-            onClicked:  controller.sendDebugMsg(253, 1, 1)
+            onClicked:  controller.sendNamedValueFloatMsg("onoffGNSS", 1)
         }
         Row{
             spacing: 5

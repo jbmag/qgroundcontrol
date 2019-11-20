@@ -2,6 +2,8 @@
 #include "MultiVehicleManager.h"
 #include "QGCApplication.h"
 
+#include "VehicleExtensionTopo.h"
+
 #include <QSettings>
 
 CustomSuppTrackManager::CustomSuppTrackManager(void) :
@@ -15,12 +17,12 @@ void CustomSuppTrackManager::_initialize(void)
         _vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
     }
 
-    QObject::connect(_vehicle, &Vehicle::giinavCoordinateChanged, this, &CustomSuppTrackManager::updateGiinavCoordinates);
-    QObject::connect(_vehicle, &Vehicle::toggleGiinavOnMap, this, &CustomSuppTrackManager::toggleGiinavOnMap);
+    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::giinavCoordinateChanged, this, &CustomSuppTrackManager::updateGiinavCoordinates);
+    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::toggleGiinavOnMap, this, &CustomSuppTrackManager::toggleGiinavOnMap);
 }
 void CustomSuppTrackManager::updateGiinavCoordinates(void)
 {
-    _giinavCoordinates = _vehicle->_getGiinavCoordinates();
+    _giinavCoordinates = _vehicle->vehicleExtensionTopo.getGiinavCoordinates();
 
 
     emit giinavCoordinatesChanged();

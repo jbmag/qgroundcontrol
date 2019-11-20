@@ -22,6 +22,8 @@
 #include "SettingsFact.h"
 #include "QGCMapCircle.h"
 
+#include "VehicleExtensionTopo.h"
+
 class UAS;
 class UASInterface;
 class FirmwarePlugin;
@@ -689,11 +691,6 @@ public:
     Q_PROPERTY(quint64  vehicleUID                  READ vehicleUID                 NOTIFY vehicleUIDChanged)
     Q_PROPERTY(QString  vehicleUIDStr               READ vehicleUIDStr              NOTIFY vehicleUIDChanged)
 
-    // property text of giinav status
-    Q_PROPERTY(QString giinavStatus MEMBER _currGiinavStatus NOTIFY giinavStatusChanged)
-    // property for giinav_coordinate 
-    Q_PROPERTY(QGeoCoordinate giinavCoordinate MEMBER _giinavCoordinate NOTIFY giinavCoordinateChanged)
-
     /// Resets link status counters
     Q_INVOKABLE void resetCounters  ();
 
@@ -813,8 +810,10 @@ public:
     void sendMessageMultiple(mavlink_message_t message);
 
     /// Sends a debug Message, MAVLink
-    void sendMessageDebug(uint8_t timestamp, uint8_t index, float value);
+    void sendMessageDebug(char name[], float value);
 
+    /// object to extend vehicle class with TOPO functions
+    VehicleExtensionTopo vehicleExtensionTopo;
 
     /// Provides access to uas from vehicle. Temporary workaround until UAS is fully phased out.
     UAS* uas(void) { return _uas; }
@@ -873,10 +872,6 @@ public:
     //-- Mavlink Logging
     void startMavlinkLog();
     void stopMavlinkLog();
-
-    //TOPO mod: get current giinav status
-    QString _getCurrGiinavStatus(void);
-    QGeoCoordinate _getGiinavCoordinates(void);
 
     /// Requests the specified data stream from the vehicle
     ///     @param stream Stream which is being requested
@@ -1088,9 +1083,6 @@ public:
     quint64     mavlinkLossCount        () { return _mavlinkLossCount; }        /// Total number of lost messages
     float       mavlinkLossPercent      () { return _mavlinkLossPercent; }      /// Running loss rate
 
-    //TOPO mod
-    //toggle boolean that determine if Giinav coordinates are displayed on Map
-    void _toggleDisplayGiinav(void);
 
 signals:
     void allLinksInactive(Vehicle* vehicle);
@@ -1199,15 +1191,6 @@ signals:
     void requestProtocolVersion(unsigned version);
     void mavlinkStatusChanged();
 
-    //TOPO mod start: signal emitted when giinav status changed
-    void giinavStatusChanged();
-    // signal emitted when new giinav coordinate
-    void giinavCoordinateChanged();
-    // signal emitted when giinav coordinates are received for the first time
-    void giinavStartable();
-    // signal emitted when switch button is toggled in qml widget
-    void toggleGiinavOnMap();
-
 private slots:
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
     void _linkInactiveOrDeleted(LinkInterface* link);
@@ -1311,9 +1294,9 @@ private:
     void _updateArmed(bool armed);
     bool _apmArmingNotRequired(void);
 
-    //TOPO mod start: declare handle for debug mavlink message
-    void _handleDebug(mavlink_message_t& message);
+    //handle for debug mavlink messages
     void _handleDebugVect(mavlink_message_t& message);
+    void _handleNamedValueFloat(mavlink_message_t& message);
 
     int     _id;                    ///< Mavlink system id
     int     _defaultComponentId;
@@ -1495,21 +1478,6 @@ private:
     QGCMapCircle    _orbitMapCircle;
     QTimer          _orbitTelemetryTimer;
     static const int _orbitTelemetryTimeoutMsecs = 3000; // No telemetry for this amount and orbit will go inactive
-
-    //TOPO: mod START
-    //variables to handle incoming status as debug named value float mavlink messages
-    //static array for status giinav message
-    static const char* const  _giinavStatus [];
-    static const int _differentStatusNb;
-    uint32_t _timestampRcvDebug;
-    uint16_t _messageValueDebug;
-    QString _currGiinavStatus;
-    uint64_t _timestampRcvDebugVect;
-    static const std::string _msgNameDebugVect;
-    //coordinates from Giinav
-    QGeoCoordinate _giinavCoordinate;
-    bool _displayGiinav;
-    //TOPO: mod END
 
     // FactGroup facts
 

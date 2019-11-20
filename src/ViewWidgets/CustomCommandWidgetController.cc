@@ -15,6 +15,8 @@
 #include "UAS.h"
 #include "QGCApplication.h"
 
+#include "VehicleExtensionTopo.h"
+
 #include <QSettings>
 #include <QUrl>
 
@@ -29,8 +31,8 @@ CustomCommandWidgetController::CustomCommandWidgetController(void) :
     QSettings settings;
     _customQmlFile = settings.value(_settingsKey).toString();
     //TOPO mod
-    QObject::connect(_vehicle, &Vehicle::giinavStatusChanged, this, &CustomCommandWidgetController::updateGiinavStatus);
-    QObject::connect(_vehicle, &Vehicle::giinavStartable, this, &CustomCommandWidgetController::giinavReceivedFirstTime);
+    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::giinavStatusChanged, this, &CustomCommandWidgetController::updateGiinavStatus);
+    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::giinavStartable, this, &CustomCommandWidgetController::giinavReceivedFirstTime);
 }
 
 void CustomCommandWidgetController::sendCommand(int commandId, QVariant componentId, QVariant confirm, QVariant param1, QVariant param2, QVariant param3, QVariant param4, QVariant param5, QVariant param6, QVariant param7)
@@ -46,15 +48,15 @@ void CustomCommandWidgetController::sendCommand(int commandId, QVariant componen
 }
 
 //MOD for TOPO
-void CustomCommandWidgetController::sendDebugMsg(int timeStamp, int index, float value)
+void CustomCommandWidgetController::sendNamedValueFloatMsg(char name[], int value)
 {
     if(_vehicle) {
-        _vehicle->sendMessageDebug((uint8_t)timeStamp, (uint8_t)index, value);
+        _vehicle->sendMessageDebug(name, value);
     }
 }
 
 void CustomCommandWidgetController::updateGiinavStatus(void){
-    _currGiinavStatus = _vehicle->_getCurrGiinavStatus();
+    _currGiinavStatus = _vehicle->vehicleExtensionTopo.getCurrGiinavStatus();
     emit statusChanged();
 }
 
@@ -68,7 +70,7 @@ QString CustomCommandWidgetController::getCurrentGiinavStatus(void){
 }
 
 void CustomCommandWidgetController::toggleGiinav(void){
-    _vehicle->_toggleDisplayGiinav();
+    _vehicle->vehicleExtensionTopo.toggleDisplayGiinav();
 }
 
 void CustomCommandWidgetController::selectQmlFile(void)

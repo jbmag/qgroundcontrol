@@ -680,6 +680,7 @@ HEADERS += \
     src/QGCQFileDialog.h \
     src/QGCMessageBox.h \
     src/RunGuard.h \
+    src/Vehicle/VehicleExtensionTopo.h \
     src/ViewWidgets/CustomCommandWidget.h \
     src/ViewWidgets/CustomCommandWidgetController.h \
     src/ViewWidgets/ViewWidgetController.h \
@@ -864,6 +865,7 @@ SOURCES += \
     src/Joystick/JoystickSDL.cc \
     src/QGCQFileDialog.cc \
     src/RunGuard.cc \
+    src/Vehicle/VehicleExtensionTopo.cc \
     src/ViewWidgets/CustomCommandWidget.cc \
     src/ViewWidgets/CustomCommandWidgetController.cc \
     src/ViewWidgets/ViewWidgetController.cc \

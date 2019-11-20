@@ -59,6 +59,7 @@
 #include "FirmwarePluginManager.h"
 #include "MultiVehicleManager.h"
 #include "Vehicle.h"
+#include "VehicleExtensionTopo.h"
 #include "JoystickConfigController.h"
 #include "JoystickManager.h"
 #include "QmlObjectListModel.h"

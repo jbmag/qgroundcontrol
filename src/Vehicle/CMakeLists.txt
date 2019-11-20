@@ -12,6 +12,7 @@ add_library(Vehicle
 	MAVLinkLogManager.cc
 	MultiVehicleManager.cc
 	Vehicle.cc
+        VehicleExtensionTopo.cc
 	${EXTRA_SRC}
 )
 
