@@ -15,6 +15,8 @@ Rectangle {
     anchors.fill:   parent
     color:          qgcPal.window
     id: frame
+
+    //item handling signals to and from vehicle.cc
     CustomCommandWidgetController {
         id:         controller
         factPanel:  panel

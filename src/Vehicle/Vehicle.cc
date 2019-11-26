@@ -509,6 +509,9 @@ void Vehicle::_commonInit(void)
         _settingsManager->videoSettings()->videoSource()->setRawValue(VideoSettings::videoSourceUDP);
     }
 
+    //initialize vehicle extension for TOPO
+    vehicleExtensionTopo = std::make_shared<VehicleExtensionTopo>();
+
     //-- Airspace Management
 #if defined(QGC_AIRMAP_ENABLED)
     AirspaceManager* airspaceManager = _toolbox->airspaceManager();
@@ -1685,7 +1688,7 @@ void Vehicle::_handleNamedValueFloat(mavlink_message_t &message)
 
     if(nameMsgS == "Gstatus"){
         uint16_t value = static_cast<uint16_t>(mavlink_msg_named_value_float_get_value(&message));
-        vehicleExtensionTopo.handleReceivedGiinavStatus(value);
+        vehicleExtensionTopo->handleReceivedGiinavStatus(value);
     }
 }
 
@@ -1698,7 +1701,7 @@ void Vehicle::_handleDebugVect(mavlink_message_t& message)
 
     if (nameMsgS == "Gcoord")
     {
-        vehicleExtensionTopo.handleReceivedGiinavCoordinates(mavlink_msg_debug_vect_get_x(&message), mavlink_msg_debug_vect_get_y(&message), mavlink_msg_debug_vect_get_z(&message), mavlink_msg_debug_vect_get_time_usec(&message));
+        vehicleExtensionTopo->handleReceivedGiinavCoordinates(mavlink_msg_debug_vect_get_x(&message), mavlink_msg_debug_vect_get_y(&message), mavlink_msg_debug_vect_get_z(&message), mavlink_msg_debug_vect_get_time_usec(&message));
     }
     
 }

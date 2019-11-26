@@ -27,6 +27,7 @@ public slots:
 
 private:
     Vehicle*            _vehicle;
+    std::shared_ptr<VehicleExtensionTopo> _vehicleExt;
     QGeoCoordinate      _giinavCoordinates;
     float _giinavLong;
     float _giinavLat;

@@ -23,6 +23,7 @@
 #include "QGCMapCircle.h"
 
 #include "VehicleExtensionTopo.h"
+#include <memory>
 
 class UAS;
 class UASInterface;
@@ -813,7 +814,7 @@ public:
     void sendMessageDebug(char name[], float value);
 
     /// object to extend vehicle class with TOPO functions
-    VehicleExtensionTopo vehicleExtensionTopo;
+    std::shared_ptr<VehicleExtensionTopo> vehicleExtensionTopo;
 
     /// Provides access to uas from vehicle. Temporary workaround until UAS is fully phased out.
     UAS* uas(void) { return _uas; }

@@ -15,6 +15,8 @@
 #include "AutoPilotPlugin.h"
 #include "FactPanelController.h"
 
+#include "VehicleExtensionTopo.h"
+
 class CustomCommandWidgetController : public FactPanelController
 {
 	Q_OBJECT
@@ -27,10 +29,10 @@ public:
 
 	
     Q_INVOKABLE void sendCommand    (int commandId, QVariant componentId, QVariant confirm, QVariant param1, QVariant param2, QVariant param3, QVariant param4, QVariant param5, QVariant param6, QVariant param7);
-    //MOD for TOPO
-    Q_INVOKABLE void sendNamedValueFloatMsg   (char name[], int value);
+
+    Q_INVOKABLE void sendNamedValueFloatMsg   (QString name, int value);
     Q_INVOKABLE QString getCurrentGiinavStatus (void);
-    //End MOD
+
     Q_INVOKABLE void selectQmlFile  (void);
     Q_INVOKABLE void clearQmlFile   (void);
     Q_INVOKABLE void toggleGiinav   (void);
@@ -48,6 +50,7 @@ public slots:
 
 private:
     Vehicle*            _vehicle;
+    std::shared_ptr<VehicleExtensionTopo> _vehicleExt;
     QString             _customQmlFile;
     static const char*  _settingsKey;
     QString _currGiinavStatus;

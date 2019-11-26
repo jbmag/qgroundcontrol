@@ -151,13 +151,19 @@ Map {
         onCoordinateChanged: lineGiinav.addCoordinate(coordinate)
     }
 
+    function resetGiinavLine() {
+        if (displayGiinav == false){
+            lineGiinav.path = []
+        }
+    }
+    onDisplayGiinavChanged: resetGiinavLine()
     // giinav track
     MapPolyline {
         id : lineGiinav
         line.width: 3
         line.color: "blue"
         visible: displayGiinav
-        //giinavMapItem.onCoordinateChanged: addCoordinate(giinavMapItem.coordinate)
+        //onDisplayGiinavChanged: resetGiinavLine()
 
     }
 

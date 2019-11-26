@@ -15,7 +15,7 @@
 #include "UAS.h"
 #include "QGCApplication.h"
 
-#include "VehicleExtensionTopo.h"
+
 
 #include <QSettings>
 #include <QUrl>
@@ -27,12 +27,14 @@ CustomCommandWidgetController::CustomCommandWidgetController(void) :
 {
     if(qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()) {
         _vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
+        _vehicleExt = _vehicle->vehicleExtensionTopo;
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::giinavStatusChanged, this, &CustomCommandWidgetController::updateGiinavStatus);
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::giinavStartable, this, &CustomCommandWidgetController::giinavReceivedFirstTime);
     }
     QSettings settings;
     _customQmlFile = settings.value(_settingsKey).toString();
     //TOPO mod
-    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::giinavStatusChanged, this, &CustomCommandWidgetController::updateGiinavStatus);
-    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::giinavStartable, this, &CustomCommandWidgetController::giinavReceivedFirstTime);
+
 }
 
 void CustomCommandWidgetController::sendCommand(int commandId, QVariant componentId, QVariant confirm, QVariant param1, QVariant param2, QVariant param3, QVariant param4, QVariant param5, QVariant param6, QVariant param7)
@@ -47,19 +49,23 @@ void CustomCommandWidgetController::sendCommand(int commandId, QVariant componen
     }
 }
 
-//MOD for TOPO
-void CustomCommandWidgetController::sendNamedValueFloatMsg(char name[], int value)
+//sends a NamedValueFloat MAVLink message using the Vehicle class
+void CustomCommandWidgetController::sendNamedValueFloatMsg(QString name, int value)
 {
+    char nameC[10];
+    memcpy(nameC, name.toStdString().c_str(), static_cast<size_t>(name.size()));
+    nameC[name.size()] = 0;
     if(_vehicle) {
-        _vehicle->sendMessageDebug(name, value);
+        _vehicle->sendMessageDebug(nameC, value);
     }
 }
 
 void CustomCommandWidgetController::updateGiinavStatus(void){
-    _currGiinavStatus = _vehicle->vehicleExtensionTopo.getCurrGiinavStatus();
+    _currGiinavStatus = _vehicleExt->getCurrGiinavStatus();
     emit statusChanged();
 }
 
+//called when giinavStartable signal is received
 void CustomCommandWidgetController::giinavReceivedFirstTime(void){
     emit giinavStart();
 }
@@ -70,7 +76,7 @@ QString CustomCommandWidgetController::getCurrentGiinavStatus(void){
 }
 
 void CustomCommandWidgetController::toggleGiinav(void){
-    _vehicle->vehicleExtensionTopo.toggleDisplayGiinav();
+    _vehicleExt->toggleDisplayGiinav();
 }
 
 void CustomCommandWidgetController::selectQmlFile(void)

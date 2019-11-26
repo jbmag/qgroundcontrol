@@ -15,14 +15,16 @@ void CustomSuppTrackManager::_initialize(void)
 {
     if(qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()) {
         _vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
+        _vehicleExt = _vehicle->vehicleExtensionTopo;
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::giinavCoordinateChanged, this, &CustomSuppTrackManager::updateGiinavCoordinates);
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::toggleGiinavOnMap, this, &CustomSuppTrackManager::toggleGiinavOnMap);
     }
 
-    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::giinavCoordinateChanged, this, &CustomSuppTrackManager::updateGiinavCoordinates);
-    QObject::connect(&_vehicle->vehicleExtensionTopo, &VehicleExtensionTopo::toggleGiinavOnMap, this, &CustomSuppTrackManager::toggleGiinavOnMap);
+
 }
 void CustomSuppTrackManager::updateGiinavCoordinates(void)
 {
-    _giinavCoordinates = _vehicle->vehicleExtensionTopo.getGiinavCoordinates();
+    _giinavCoordinates = _vehicleExt->getGiinavCoordinates();
 
 
     emit giinavCoordinatesChanged();

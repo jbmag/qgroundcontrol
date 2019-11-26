@@ -20,9 +20,10 @@ public:
     // get current giinav status
     QString getCurrGiinavStatus(void);
     QGeoCoordinate getGiinavCoordinates(void);
-    //toggle boolean that determine if Giinav coordinates are displayed on Map
+    //toggle boolean that determine if Giinav coordinates should be displayed on Map
     void toggleDisplayGiinav(void);
 
+    //handle functions used in Vehicle.cc when a new MAVLink message is received
     void handleReceivedGiinavStatus(uint16_t msg_value);
     void handleReceivedGiinavCoordinates(float latitude, float longitude, float altitude, uint64_t timestamp);
 
