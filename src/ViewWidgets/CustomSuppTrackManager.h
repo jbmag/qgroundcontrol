@@ -13,24 +13,28 @@ class CustomSuppTrackManager : public QObject
 public:
     CustomSuppTrackManager(void);
     Q_PROPERTY(QGeoCoordinate giinavCoordinates MEMBER _giinavCoordinates NOTIFY giinavCoordinatesChanged)
+    Q_PROPERTY(QGeoCoordinate rfCoordinates MEMBER _rfCoordinates NOTIFY rfCoordinatesChanged)
     Q_INVOKABLE void _initialize  (void);
 
 signals:
-//    void newGiinavCoordinates(void);
     void displayGiinavMapItem(void);
     void giinavCoordinatesChanged(void);
+    void displayRFMapItem(void);
+    void rfCoordinatesChanged(void);
 
 
 public slots:
     void updateGiinavCoordinates(void);
     void toggleGiinavOnMap(void);
+    void updateRFCoordinates(void);
+    void toggleRFOnMap(void);
 
 private:
     Vehicle*            _vehicle;
     std::shared_ptr<VehicleExtensionTopo> _vehicleExt;
     QGeoCoordinate      _giinavCoordinates;
-    float _giinavLong;
-    float _giinavLat;
+    QGeoCoordinate      _rfCoordinates;
+
 
 };
 

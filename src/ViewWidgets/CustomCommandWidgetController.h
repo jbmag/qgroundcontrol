@@ -32,19 +32,25 @@ public:
 
     Q_INVOKABLE void sendNamedValueFloatMsg   (QString name, int value);
     Q_INVOKABLE QString getCurrentGiinavStatus (void);
+    Q_INVOKABLE QString getCurrentRFStatus (void);
 
     Q_INVOKABLE void selectQmlFile  (void);
     Q_INVOKABLE void clearQmlFile   (void);
     Q_INVOKABLE void toggleGiinav   (void);
+    Q_INVOKABLE void toggleRF   (void);
     
 signals:
     void customQmlFileChanged   (const QString& customQmlFile);
-    void statusChanged (void);
+    void newGiinavStatus (void);
+    void newRFStatus (void);
     void giinavStart(void);
+    void rfStart(void);
 
 public slots:
     void updateGiinavStatus(void);
     void giinavReceivedFirstTime(void);
+    void updateRFStatus(void);
+    void rfReceivedFirstTime(void);
 
 
 
@@ -54,5 +60,6 @@ private:
     QString             _customQmlFile;
     static const char*  _settingsKey;
     QString _currGiinavStatus;
+    QString _currRFStatus;
 };
 

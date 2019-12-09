@@ -1690,6 +1690,10 @@ void Vehicle::_handleNamedValueFloat(mavlink_message_t &message)
         uint16_t value = static_cast<uint16_t>(mavlink_msg_named_value_float_get_value(&message));
         vehicleExtensionTopo->handleReceivedGiinavStatus(value);
     }
+    if(nameMsgS == "RFstatus"){
+        uint16_t value = static_cast<uint16_t>(mavlink_msg_named_value_float_get_value(&message));
+        vehicleExtensionTopo->handleReceivedRFStatus(value);
+    }
 }
 
 void Vehicle::_handleDebugVect(mavlink_message_t& message)
@@ -1703,7 +1707,10 @@ void Vehicle::_handleDebugVect(mavlink_message_t& message)
     {
         vehicleExtensionTopo->handleReceivedGiinavCoordinates(mavlink_msg_debug_vect_get_x(&message), mavlink_msg_debug_vect_get_y(&message), mavlink_msg_debug_vect_get_z(&message), mavlink_msg_debug_vect_get_time_usec(&message));
     }
-    
+    if (nameMsgS == "RFcoord")
+    {
+        vehicleExtensionTopo->handleReceivedRFCoordinates(mavlink_msg_debug_vect_get_x(&message), mavlink_msg_debug_vect_get_y(&message), mavlink_msg_debug_vect_get_z(&message), mavlink_msg_debug_vect_get_time_usec(&message));
+    }
 }
 
 

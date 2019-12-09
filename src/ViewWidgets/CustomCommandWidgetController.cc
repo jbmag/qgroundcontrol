@@ -30,6 +30,8 @@ CustomCommandWidgetController::CustomCommandWidgetController(void) :
         _vehicleExt = _vehicle->vehicleExtensionTopo;
         QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::giinavStatusChanged, this, &CustomCommandWidgetController::updateGiinavStatus);
         QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::giinavStartable, this, &CustomCommandWidgetController::giinavReceivedFirstTime);
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::rfStatusChanged, this, &CustomCommandWidgetController::updateRFStatus);
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::rfStartable, this, &CustomCommandWidgetController::rfReceivedFirstTime);
     }
     QSettings settings;
     _customQmlFile = settings.value(_settingsKey).toString();
@@ -62,7 +64,12 @@ void CustomCommandWidgetController::sendNamedValueFloatMsg(QString name, int val
 
 void CustomCommandWidgetController::updateGiinavStatus(void){
     _currGiinavStatus = _vehicleExt->getCurrGiinavStatus();
-    emit statusChanged();
+    emit newGiinavStatus();
+}
+
+void CustomCommandWidgetController::updateRFStatus(void){
+    _currRFStatus = _vehicleExt->getCurrRFStatus();
+    emit newRFStatus();
 }
 
 //called when giinavStartable signal is received
@@ -70,13 +77,26 @@ void CustomCommandWidgetController::giinavReceivedFirstTime(void){
     emit giinavStart();
 }
 
+//called when rfStartable signal is received
+void CustomCommandWidgetController::rfReceivedFirstTime(void){
+    emit rfStart();
+}
+
 
 QString CustomCommandWidgetController::getCurrentGiinavStatus(void){
     return _currGiinavStatus;
 }
 
+QString CustomCommandWidgetController::getCurrentRFStatus(void){
+    return _currRFStatus;
+}
+
 void CustomCommandWidgetController::toggleGiinav(void){
     _vehicleExt->toggleDisplayGiinav();
+}
+
+void CustomCommandWidgetController::toggleRF(void){
+    _vehicleExt->toggleDisplayRF();
 }
 
 void CustomCommandWidgetController::selectQmlFile(void)

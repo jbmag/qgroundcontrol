@@ -129,20 +129,24 @@ Map {
     }
 
     property bool displayGiinav: false
-    // object to handle giinav coordinates
+    property bool displayRF: false
+    // object to handle supp coordinates
     CustomSuppTrackManager {
-                   id : suppTrackGiinav
+                   id : suppTracksTopo
                    onDisplayGiinavMapItem: {
                        displayGiinav = !displayGiinav
                    }
+                   onDisplayRFMapItem: {
+                       displayRF= !displayRF
+                   }
                }
     // call to set active vehicle in CustomSuppTrackManager
-    on_ActiveVehicleChanged: suppTrackGiinav._initialize()
+    on_ActiveVehicleChanged: suppTracksTopo._initialize()
 
     // item that retpresents giinav coordinates on the map
     MapQuickItem {
         id: giinavMapItem
-        coordinate: suppTrackGiinav.giinavCoordinates
+        coordinate: suppTracksTopo.giinavCoordinates
         sourceItem: Rectangle { width: 25; height: 25; color: "red"; border.width: 2; border.color: "blue"; smooth: true; radius: 15 }
         opacity:1.0
         anchorPoint.x:  sourceItem.width / 2
@@ -163,6 +167,33 @@ Map {
         line.width: 3
         line.color: "blue"
         visible: displayGiinav
+
+    }
+
+    // item that retpresents VDM RoamFree coordinates on the map
+    MapQuickItem {
+        id: rfMapItem
+        coordinate: suppTracksTopo.rfCoordinates
+        sourceItem: Rectangle { width: 25; height: 25; color: "yellow"; border.width: 2; border.color: "blue"; smooth: true; radius: 15 }
+        opacity:1.0
+        anchorPoint.x:  sourceItem.width / 2
+        anchorPoint.y:  sourceItem.height / 2
+        visible: displayRF
+        onCoordinateChanged: lineRF.addCoordinate(coordinate)
+    }
+
+    function resetRFLine() {
+        if (displayRF == false){
+            lineRF.path = []
+        }
+    }
+    onDisplayRFChanged: resetRFLine()
+    // Roam Free VDM track
+    MapPolyline {
+        id : lineRF
+        line.width: 3
+        line.color: "green"
+        visible: displayRF
 
     }
 

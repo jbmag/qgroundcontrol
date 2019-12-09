@@ -18,6 +18,8 @@ void CustomSuppTrackManager::_initialize(void)
         _vehicleExt = _vehicle->vehicleExtensionTopo;
         QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::giinavCoordinateChanged, this, &CustomSuppTrackManager::updateGiinavCoordinates);
         QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::toggleGiinavOnMap, this, &CustomSuppTrackManager::toggleGiinavOnMap);
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::rfCoordinateChanged, this, &CustomSuppTrackManager::updateRFCoordinates);
+        QObject::connect(_vehicleExt.get(), &VehicleExtensionTopo::toggleRFOnMap, this, &CustomSuppTrackManager::toggleRFOnMap);
     }
 
 
@@ -30,7 +32,20 @@ void CustomSuppTrackManager::updateGiinavCoordinates(void)
     emit giinavCoordinatesChanged();
 }
 
+void CustomSuppTrackManager::updateRFCoordinates(void)
+{
+    _rfCoordinates = _vehicleExt->getRFCoordinates();
+
+
+    emit rfCoordinatesChanged();
+}
+
 void CustomSuppTrackManager::toggleGiinavOnMap(void)
 {
            emit displayGiinavMapItem();
+}
+
+void CustomSuppTrackManager::toggleRFOnMap(void)
+{
+           emit displayRFMapItem();
 }

@@ -20,11 +20,16 @@ Rectangle {
     CustomCommandWidgetController {
         id:         controller
         factPanel:  panel
-        onStatusChanged: {
+        onNewGiinavStatus: {
             mtext.append(controller.getCurrentGiinavStatus()+"\n")
             mflick.flick(0,-1000)
         }
+        onNewRFStatus: {
+            mtext.append(controller.getCurrentRFStatus()+"\n")
+            mflick.flick(0,-1000)
+        }
         onGiinavStart: switchGiinav.enabled= true
+        onRfStart: switchRF.enabled= true
 
     }
 
@@ -65,6 +70,18 @@ Rectangle {
             }
             Text {           
                 text: "Display Giinav Solution on Map"
+                color: "white"
+            }
+        }
+        Row{
+            spacing: 5
+            QGCSwitch{
+                id: switchRF
+                enabled: false
+                onCheckedChanged: controller.toggleRF()
+            }
+            Text {
+                text: "Display VDM RoamFree Solution on Map"
                 color: "white"
             }
         }
