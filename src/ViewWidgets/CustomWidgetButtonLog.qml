@@ -28,15 +28,33 @@ Rectangle {
 
     }
 
+    function toggleGNSS() {
+        if (switchGNSS.checked == true)
+        {
+            controller.sendNamedValueFloatMsg("onoffGNSS", 1)
+        }
+        else
+        {
+            controller.sendNamedValueFloatMsg("onoffGNSS", 0)
+        }
+    }
+
 
     QGCPalette { id: qgcPal; colorGroupEnabled: enabled }
 
     Column {
         spacing: ScreenTools.defaultFontPixelHeight
-
-        QGCButton {
-            text: "Disable GNSS"
-            onClicked:  controller.sendNamedValueFloatMsg("onoffGNSS", 1)
+        Row{
+            spacing: 5
+            QGCSwitch{
+                id: switchGNSS
+                enabled: true
+                onCheckedChanged: toggleGNSS()
+            }
+            Text {
+                text: "Toggle GNSS in Giinav and VDM Roamfree"
+                color: "white"
+            }
         }
         Row{
             spacing: 5
@@ -57,7 +75,7 @@ Rectangle {
         Flickable{
             id: mflick
             width: frame.width
-            height: frame.height - 70
+            height: frame.height - 145
             contentWidth: frame.width
             contentHeight: contentItem.childrenRect.height
             clip: true
