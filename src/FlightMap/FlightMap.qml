@@ -163,7 +163,6 @@ Map {
         line.width: 3
         line.color: "blue"
         visible: displayGiinav
-        //onDisplayGiinavChanged: resetGiinavLine()
 
     }
 

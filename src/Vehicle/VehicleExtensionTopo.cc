@@ -1,6 +1,6 @@
 #include "VehicleExtensionTopo.h"
 
-const char* const VehicleExtensionTopo::_giinavStatus[] =  {"first status","   Giinav Status","third status"};
+const char* const VehicleExtensionTopo::_giinavStatus[] =  {"   First status","   Second status","   Third status"};
 const int VehicleExtensionTopo::_nbOfGiinavStatus = 3;
 
 VehicleExtensionTopo::VehicleExtensionTopo(void)
